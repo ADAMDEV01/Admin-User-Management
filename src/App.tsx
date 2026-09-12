@@ -41,7 +41,7 @@ function App() {
     <aside className={`sidebar${sidebarOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
       <div className="brand"><div className="brand-mark">a</div><span>atlas</span></div>
       <div className="workspace-switch"><span className="workspace-dot">C</span><span>Catalog workspace</span><ChevronDown size={15}/></div>
-      <nav><p className="nav-label">Workspace</p><Nav icon={<LayoutDashboard/>} label="Overview"/><Nav icon={<BarChart3/>} label="Analytics"/><Nav icon={<Users/>} label="Users" active badge={stats.total}/><Nav icon={<FileText/>} label="Content"/><p className="nav-label second">Manage</p><Nav icon={<ShieldCheck/>} label="Roles & permissions"/><Nav icon={<Settings/>} label="Settings"/></nav>
+      <nav><p className="nav-label">Workspace</p><Nav icon={<LayoutDashboard/>} label="Overview" onNavigate={() => setSidebarOpen(false)}/><Nav icon={<BarChart3/>} label="Analytics" onNavigate={() => setSidebarOpen(false)}/><Nav icon={<Users/>} label="Users" active badge={stats.total} onNavigate={() => setSidebarOpen(false)}/><Nav icon={<FileText/>} label="Content" onNavigate={() => setSidebarOpen(false)}/><p className="nav-label second">Manage</p><Nav icon={<ShieldCheck/>} label="Roles & permissions" onNavigate={() => setSidebarOpen(false)}/><Nav icon={<Settings/>} label="Settings" onNavigate={() => setSidebarOpen(false)}/></nav>
       <div className="sidebar-footer"><div className="help-card"><HelpCircle size={17}/><div><b>Need help?</b><small>Visit our help center</small></div><ChevronRight size={15}/></div><div className="profile"><div className="avatar me">OR</div><div><b>Olivia Rhye</b><small>olivia@catalogapp.io</small></div><MoreHorizontal size={18}/></div></div>
     </aside>
     <main>
@@ -59,7 +59,7 @@ function App() {
   </div>
 }
 
-function Nav({icon,label,active,badge}:{icon:ReactNode,label:string,active?:boolean,badge?:number}) { return <a className={active ? 'nav-item active' : 'nav-item'} href={`#${label.toLowerCase()}`} onClick={e => e.preventDefault()}>{icon}<span>{label}</span>{badge && <em>{badge}</em>}</a> }
+function Nav({icon,label,active,badge,onNavigate}:{icon:ReactNode,label:string,active?:boolean,badge?:number,onNavigate?:()=>void}) { return <a className={active ? 'nav-item active' : 'nav-item'} href={`#${label.toLowerCase()}`} onClick={onNavigate}>{icon}<span>{label}</span>{badge && <em>{badge}</em>}</a> }
 function Stat({label,value,hint,good}:{label:string,value:number,hint:string,good?:boolean}) { return <div className="stat"><span>{label}</span><strong>{value}</strong><small className={good ? 'good' : ''}>{good && '↗ '}{hint}</small><div className="spark"><i/><i/><i/><i/><i/><i/><i/></div></div> }
 function Select({label,options,onChange}:{label:string,options:string[],onChange:(v:string)=>void}) { return <div className="select-wrap"><select value={label} onChange={e => onChange(e.target.value)} aria-label={label}>{options.map(o => <option key={o}>{o}</option>)}</select><ChevronDown size={15}/></div> }
 function UserModal({user,onClose,onSave}:{user:User|null,onClose:()=>void,onSave:(u:User)=>void}) {
