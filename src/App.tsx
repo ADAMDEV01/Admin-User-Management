@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
-import { Search, Bell, HelpCircle, Settings, LayoutDashboard, Users, ShieldCheck, FileText, BarChart3, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal, Plus, SlidersHorizontal, Download, X, Check, Trash2, Mail, UserRound, LockKeyhole } from 'lucide-react'
+import { Search, Bell, HelpCircle, Settings, LayoutDashboard, Users, ShieldCheck, FileText, BarChart3, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal, Plus, SlidersHorizontal, Download, X, Check, Trash2, Mail, UserRound, LockKeyhole, Menu } from 'lucide-react'
 import { seedUsers } from './data'
 import { roleDescriptions } from './types'
 import type { Role, User, UserStatus } from './types'
@@ -23,6 +23,7 @@ function App() {
   const [editing, setEditing] = useState<User | null>(null)
   const [menu, setMenu] = useState<string | null>(null)
   const [notice, setNotice] = useState('')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const perPage = 8
   const filtered = useMemo(() => users.filter(u => (u.name + u.email).toLowerCase().includes(query.toLowerCase()) && (role === 'All roles' || u.role === role) && (status === 'All status' || u.status === status) && (department === 'All departments' || u.department === department)).sort((a, b) => sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)), [users, query, role, status, department, sortAsc])
   const pages = Math.max(1, Math.ceil(filtered.length / perPage))
@@ -36,14 +37,15 @@ function App() {
   const updateStatus = (u: User, value: UserStatus) => save({ ...u, status: value })
 
   return <div className="app" onClick={() => menu && setMenu(null)}>
-    <aside className="sidebar">
+    {sidebarOpen && <button className="sidebar-overlay" aria-label="Close navigation" onClick={() => setSidebarOpen(false)} />}
+    <aside className={`sidebar${sidebarOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
       <div className="brand"><div className="brand-mark">a</div><span>atlas</span></div>
       <div className="workspace-switch"><span className="workspace-dot">C</span><span>Catalog workspace</span><ChevronDown size={15}/></div>
       <nav><p className="nav-label">Workspace</p><Nav icon={<LayoutDashboard/>} label="Overview"/><Nav icon={<BarChart3/>} label="Analytics"/><Nav icon={<Users/>} label="Users" active badge={stats.total}/><Nav icon={<FileText/>} label="Content"/><p className="nav-label second">Manage</p><Nav icon={<ShieldCheck/>} label="Roles & permissions"/><Nav icon={<Settings/>} label="Settings"/></nav>
       <div className="sidebar-footer"><div className="help-card"><HelpCircle size={17}/><div><b>Need help?</b><small>Visit our help center</small></div><ChevronRight size={15}/></div><div className="profile"><div className="avatar me">OR</div><div><b>Olivia Rhye</b><small>olivia@catalogapp.io</small></div><MoreHorizontal size={18}/></div></div>
     </aside>
     <main>
-      <header><div className="breadcrumb"><span>Workspace</span><ChevronRight size={14}/><b>Users</b></div><div className="header-actions"><button className="icon-btn" aria-label="Help"><HelpCircle/></button><button className="icon-btn" aria-label="Notifications"><Bell/><i/></button><div className="header-avatar">OR</div></div></header>
+      <header><div className="breadcrumb"><button className="mobile-menu icon-btn" aria-label="Open navigation" onClick={() => setSidebarOpen(true)}><Menu/></button><span>Workspace</span><ChevronRight size={14}/><b>Users</b></div><div className="header-actions"><button className="icon-btn" aria-label="Help"><HelpCircle/></button><button className="icon-btn" aria-label="Notifications"><Bell/><i/></button><div className="header-avatar">OR</div></div></header>
       <section className="content"><div className="title-row"><div><p className="eyebrow">Workspace management</p><h1>Users</h1><p className="subtitle">Manage who has access to your workspace and what they can do.</p></div><button className="primary" onClick={() => {setEditing(null); setModal('add')}}><Plus size={18}/> Invite user</button></div>
         <div className="stats"><Stat label="Total users" value={stats.total} hint="+2.5%" good/><Stat label="Active users" value={stats.active} hint="+5.1%" good/><Stat label="Pending invites" value={stats.pending} hint="Last 30 days"/><Stat label="Suspended users" value={stats.suspended} hint="Needs review"/><Stat label="Departments" value={stats.departments} hint="Across workspace"/></div>
         <div className="panel"><div className="panel-head"><div><h2>All users <span className="count">{filtered.length}</span></h2><p>A list of all users in your workspace.</p></div><button className="export" onClick={() => { const csv = 'Name,Email,Role,Status\\n' + users.map(u => `${u.name},${u.email},${u.role},${u.status}`).join('\\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download='atlas-users.csv'; a.click() }}><Download size={16}/> Export</button></div>
