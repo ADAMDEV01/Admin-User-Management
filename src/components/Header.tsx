@@ -1,0 +1,1 @@
+export function Header({ title = 'Users' }: { title?: string }) { return <header><div className="breadcrumb"><b>{title}</b></div><div className="header-actions"><span aria-label="Notifications">🔔</span><div className="header-avatar">OR</div></div></header> }
